@@ -27,8 +27,17 @@ class _ExpensesState extends State<Expenses>{
          category:Category.leisure)];
 
    void _openAddExpenseOverLay(){
-       showModalBottomSheet(context: context, builder:(cxt) => const NewExpense(),);
+       showModalBottomSheet(
+         isScrollControlled: true,
+         context: context, builder:(cxt) =>
+           NewExpense(onAddExpense: _addExpense),);
    }
+
+    void _addExpense(Expense expense){
+     setState(() {
+       _registeredExpense.add(expense);
+     });
+    }
 
    @override
   Widget build( context) {
