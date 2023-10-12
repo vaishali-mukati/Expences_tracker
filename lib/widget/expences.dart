@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:third_expences_project/widget/chart/chart.dart';
 import 'package:third_expences_project/widget/expenses_list/expense_list.dart';
 import 'package:third_expences_project/modals/expense.dart';
 import 'package:third_expences_project/widget/new_expense.dart';
@@ -32,15 +33,45 @@ class _ExpensesState extends State<Expenses>{
          context: context, builder:(cxt) =>
            NewExpense(onAddExpense: _addExpense),);
    }
-
     void _addExpense(Expense expense){
      setState(() {
        _registeredExpense.add(expense);
      });
     }
 
+    void _removeExpense(Expense expense){
+     final expenseIndex = _registeredExpense.indexOf(expense);
+     setState(() {
+       _registeredExpense.remove(expense);
+     });
+     ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+             duration:const Duration(seconds: 3),
+             content: const Text('Expense deleted'),
+           action:SnackBarAction(
+               label:'Undo',
+            onPressed:(){
+                 setState(() {
+                    _registeredExpense.insert(expenseIndex,expense);
+                 });
+            },
+
+         ),
+     ),
+     );
+    }
+
    @override
   Widget build( context) {
+
+     Widget mainContent =const  Center(child: Text('No expenses found.start adding some!'),);
+
+       if(_registeredExpense.isNotEmpty){
+         mainContent =  ExpenseList(
+                  expenses: _registeredExpense,
+                  onRemoveExpense:_removeExpense);
+       }
+
       return Scaffold(
         appBar:AppBar(
           title:const  Text('Flutter Expense Tracker'),
@@ -52,8 +83,11 @@ class _ExpensesState extends State<Expenses>{
         ),
         body:Column(
           children: [
-           const  Text('The chart'),
-           Expanded(child: ExpenseList(expenses: _registeredExpense)),
+            Chart(expenses:_registeredExpense),
+           Expanded(
+               child:mainContent,
+
+           ),
           ],
         ),
       );
